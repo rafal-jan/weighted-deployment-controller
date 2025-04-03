@@ -1,0 +1,56 @@
+apiVersion: weighted.example.com/v1alpha1
+kind: WeightedDeployment
+metadata:
+  name: sample-deployment
+spec:
+  replicas: 10
+  template:
+    selector:
+      matchLabels:
+        app: nginx
+    template:
+      metadata:
+        labels:
+          app: nginx
+      spec:
+        containers:
+        - name: nginx
+          image: nginx:latest
+          ports:
+          - containerPort: 80
+        topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: nginx
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: nginx
+                topologyKey: topology.kubernetes.io/zone
+    strategy:
+      type: RollingUpdate
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+  distribution:
+    type: WeightBased
+    targets:
+    - name: spot
+      weight: 70
+      nodeSelector:
+        node-type: spot
+      tolerations:
+      - effect: NoSchedule
+        key: instance-type
+        value: spot
+    - name: on-demand
+      weight: 30
+      nodeSelector:
+        node-type: on-demand
