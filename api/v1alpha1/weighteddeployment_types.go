@@ -67,6 +67,7 @@ type WeightedDeploymentSpec struct {
 	// +kubebuilder:validation:Minimum=0
 	Replicas int32 `json:"replicas"`
 
+	//TODO: DeplomentSpecTemplate
 	// Template is the object that describes the deployment that will be created.
 	// +kubebuilder:validation:Required
 	Template appsv1.DeploymentSpec `json:"template"`
@@ -117,6 +118,8 @@ type WeightedDeploymentStatus struct {
 	// +optional
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
 }
+
+//TODO: short name `wd` (kubectl get wd)
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status

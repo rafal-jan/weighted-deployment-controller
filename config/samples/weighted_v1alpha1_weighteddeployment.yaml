@@ -18,22 +18,6 @@ spec:
           image: nginx:latest
           ports:
           - containerPort: 80
-        topologySpreadConstraints:
-        - maxSkew: 1
-          topologyKey: topology.kubernetes.io/zone
-          whenUnsatisfiable: ScheduleAnyway
-          labelSelector:
-            matchLabels:
-              app: nginx
-        affinity:
-          podAntiAffinity:
-            preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 100
-              podAffinityTerm:
-                labelSelector:
-                  matchLabels:
-                    app: nginx
-                topologyKey: topology.kubernetes.io/zone
     strategy:
       type: RollingUpdate
       rollingUpdate:
@@ -45,7 +29,7 @@ spec:
     - name: spot
       weight: 70
       nodeSelector:
-        node-type: spot
+        karpenter.sh/capacity-type: spot
       tolerations:
       - effect: NoSchedule
         key: instance-type
@@ -53,4 +37,4 @@ spec:
     - name: on-demand
       weight: 30
       nodeSelector:
-        node-type: on-demand
+        karpenter.sh/capacity-type: on-demand
